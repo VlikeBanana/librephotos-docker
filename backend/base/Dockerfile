@@ -70,12 +70,13 @@ ENTRYPOINT ["/cronjob-upgrade"]
 
 RUN if [ "$TARGETPLATFORM" = "linux/arm64" ]; then pip3 install --no-cache-dir torch torchvision -f https://torch.kmtea.eu/whl/stable.html; else pip3 install --no-cache-dir torch torchvision; fi
 
-RUN pip3 install --no-cache-dir pyvips==2.2.1 cmake==3.21.2
+RUN pip3 install --no-cache-dir cmake==3.21.2
 
 #Build and install libraw
 WORKDIR /tmp/builds
 RUN git clone https://github.com/LibRaw/LibRaw && \
 	cd LibRaw && \ 
+	git reset --hard 2a9a4de21ea7f5d15314da8ee5f27feebf239655 && \
 	autoreconf --install && \
 	./configure && \
 	make && \
@@ -83,8 +84,8 @@ RUN git clone https://github.com/LibRaw/LibRaw && \
 
 #Build and install imagemagick
 WORKDIR /tmp/builds
-ARG IMAGEMAGICK_VERSION=7.1.0-45
-RUN curl -SL https://imagemagick.org/archive/ImageMagick-${IMAGEMAGICK_VERSION}.tar.gz | tar -zx && \
+ARG IMAGEMAGICK_VERSION=7.1.0-17
+RUN curl -SL https://imagemagick.org/archive/releases/ImageMagick-${IMAGEMAGICK_VERSION}.tar.xz | tar -xJf- && \
 	cd ImageMagick-${IMAGEMAGICK_VERSION} && \
 	./configure --with-modules && \
 	make install && \
